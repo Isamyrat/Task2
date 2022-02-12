@@ -21,12 +21,12 @@ public class Developer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Size(min = 2, max = 50)
-    @Pattern(regexp = "^[A-Za-z]")
+    @Size(min = 2, max = 50, message = "Name must have at least 2-50 characters")
+    @Pattern(regexp = "^[A-Za-z]", message = "The first character should always start with an alphabet")
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Email
+    @Email(message = "Email should be valid")
     @Column(name = "email", nullable = false)
     private String email;
 }

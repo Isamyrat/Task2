@@ -6,4 +6,5 @@ import root.developer.model.Developer;
 
 @Repository
 public interface DeveloperRepository extends CrudRepository<Developer, Long> {
+    Developer findByEmail(String email);
 }
