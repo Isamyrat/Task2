@@ -26,14 +26,6 @@ public class DeveloperService {
             response.put("This email is busy", Boolean.FALSE);
             return ResponseEntity.ok(response);
         }
-        if(developer.getName().length() > 50 || developer.getName().length() < 2){
-            response.put("Name should have length from 2 to 50 characters", Boolean.FALSE);
-            return ResponseEntity.ok(response);
-        }
-        if(!Pattern.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", developer.getEmail())){
-            response.put("Email is incorrect!! For example(qwerty@gmail.com)", Boolean.FALSE);
-            return ResponseEntity.ok(response);
-        }
 
         if(!Pattern.matches("^[A-Za-z]",  String.valueOf(developer.getName().charAt(0)))){
             response.put("Name always should start with alphabet", Boolean.FALSE);

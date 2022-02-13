@@ -24,7 +24,7 @@ public class Developer {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Email(message = "Email should be valid")
+    @Email(message = "Email should be valid!! (qwerty@gmail.com)")
     @Column(name = "email", nullable = false)
     private String email;
 }
