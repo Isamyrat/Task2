@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import root.developer.exception.DeveloperNotFoundException;
 import root.developer.model.Developer;
 import root.developer.service.DeveloperService;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 public class DeveloperController {
 
     private final DeveloperService developerService;
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
@@ -40,10 +42,10 @@ public class DeveloperController {
     }
 
     @RequestMapping(value = "/developer/find/{id}",method = RequestMethod.GET)
-    public ResponseEntity<?> findById(@PathVariable("id") Long id){
+    public ResponseEntity<?> findById(@PathVariable("id") Long id) throws DeveloperNotFoundException {
         Developer developer = developerService.findById(id);
         if (developer == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            throw  new DeveloperNotFoundException("Developer must not be null");
         } else {
             return new ResponseEntity<>(developer, HttpStatus.OK);
         }

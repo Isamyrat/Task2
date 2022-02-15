@@ -46,16 +46,18 @@ public class DeveloperService {
                 .orElseThrow(() -> new DeveloperNotFoundException("Developer not exist with id:"  + developer.getId()));
 
         if(developer.getEmail() != null){
+
             if(developerRepository.findByEmail(developer.getEmail()) != null) {
                 response.put("This email is busy", Boolean.FALSE);
                 return ResponseEntity.ok(response);
             }
-            else developer1.setEmail(developer.getEmail());
 
             if(!Pattern.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", developer.getEmail())){
                 response.put("Email is incorrect!! For example(qwerty@gmail.com)", Boolean.FALSE);
                 return ResponseEntity.ok(response);
             }
+            developer1.setEmail(developer.getEmail());
+
         }
         if(developer.getName() != null){
             if(developer.getName().length() > 50 || developer.getName().length() < 2){
