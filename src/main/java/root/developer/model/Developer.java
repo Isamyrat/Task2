@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 public class Developer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Size(min = 2, max = 50, message = "Name must have at least 2-50 characters")
     @Column(name = "name", nullable = false)

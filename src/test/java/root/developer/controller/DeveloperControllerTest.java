@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +16,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import root.developer.model.Developer;
-import root.developer.repository.DeveloperRepository;
 import root.developer.service.DeveloperService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -35,21 +34,18 @@ class DeveloperControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-
     ObjectMapper objectMapper = new ObjectMapper();
-
     ObjectWriter objectWriter = objectMapper.writer();
 
     @MockBean
     private DeveloperService developerService;
 
-    @MockBean
-    private DeveloperRepository developerRepository;
+    @InjectMocks
+    private DeveloperController developerController;
 
     Developer RECORD_1 = new Developer(1L, "Nikita", "ganu@gmail.com");
     Developer RECORD_2 = new Developer(2L, "Misha", "orlov@gmail.com");
     Developer RECORD_3 = new Developer(3L, "Sasha", "volchonok@gmail.com");
-
 
     @Test
     public void getAllRecords_success() throws Exception {
@@ -81,30 +77,26 @@ class DeveloperControllerTest {
 
     @Test
     public void createDeveloper_success() throws Exception {
-        mockMvc.perform(post("/developer/save")
-                        .content("{\"name\" : \"Nikita\", \"email\" : \"ganu@gmail.com\"}")
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk());
-
-
         Developer developer = Developer.builder()
                 .id(1L)
                 .name("Andryusha")
                 .email("varlamov@gmail.com")
                 .build();
 
-        when(developerRepository.save(developer)).thenReturn(developer);
+        Mockito.when(developerService.save(developer)).thenReturn(developer);
 
         String content = objectWriter.writeValueAsString(developer);
 
-        MockHttpServletRequestBuilder mockRequest = post("/developer/save")
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/developer/save")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content);
 
         mockMvc.perform(mockRequest)
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.name", is("Andryusha")))
+                .andExpect(jsonPath("$.email", is("varlamov@gmail.com")));
     }
     @Test
     public void updateDeveloper_success() throws Exception {
@@ -114,17 +106,20 @@ class DeveloperControllerTest {
                 .email("varlamova@gmail.com")
                 .build();
 
-        when(developerService.findById(RECORD_1.getId())).thenReturn(RECORD_1);
-
-        when(developerRepository.save(developer)).thenReturn(developer);
+        Mockito.when(developerService.findById(RECORD_1.getId())).thenReturn(RECORD_1);
+        Mockito.when(developerService.update(developer)).thenReturn(developer);
 
         String updateContent = objectWriter.writeValueAsString(developer);
+
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/developer/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(updateContent);
 
         mockMvc.perform(mockRequest)
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.name", is("Masha")))
+                .andExpect(jsonPath("$.email", is("varlamova@gmail.com")));
     }
 }
