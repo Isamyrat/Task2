@@ -53,10 +53,15 @@ class DeveloperServiceTest {
 
     @Test
     void save() {
-       /* Mockito.when(developerRepository.existsByEmail(mockDeveloper.getEmail())).thenReturn(false);
-        Mockito.when(developerService.checkUserName(mockDeveloper.getName())).thenReturn(true);
+
+        Mockito.when(mockDeveloper.getId()).thenReturn(1L);
+        Mockito.when(mockDeveloper.getName()).thenReturn("Solomon");
+        Mockito.when(mockDeveloper.getEmail()).thenReturn("ImBatman@gmail.com");
+        Mockito.when(developerRepository.existsByEmail(mockDeveloper.getEmail())).thenReturn(false);
+
+
         Mockito.when(developerRepository.save(mockDeveloper)).thenReturn(mockDeveloper);
-        Assertions.assertThat(developerService.save(mockDeveloper)).isEqualTo(mockDeveloper);*/
+
     }
 
     @Test
@@ -68,17 +73,20 @@ class DeveloperServiceTest {
 
     @Test
     void existsByEmail() {
-        Mockito.when(developerRepository.existsByEmail("ImBatman@bat.gotham")).thenReturn(true);
-        assertTrue(developerService.existsByEmail("ImBatman@bat.gotham"));
+        Mockito.when(developerRepository.existsByEmail("ImBatman@gmail.com")).thenReturn(true);
+        assertTrue(developerService.existsByEmail("ImBatman@gmail.com"));
     }
 
     @Test
     void update() {
-       /* Mockito.when(mockDeveloper.getId()).thenReturn(1L);
+        Mockito.when(mockDeveloper.getId()).thenReturn(1L);
+        Mockito.when(developerRepository.findById(mockDeveloper.getId())).thenReturn(Optional.of(mockDeveloper));
+        Mockito.when(mockDeveloper.getName()).thenReturn("Solomon");
+        Mockito.when(mockDeveloper.getEmail()).thenReturn("ImBatman@gmail.com");
         Mockito.when(developerRepository.existsByEmail(mockDeveloper.getEmail())).thenReturn(false);
-        Mockito.when(developerService.checkUserName(mockDeveloper.getName())).thenReturn(true);
         Mockito.when(developerRepository.save(mockDeveloper)).thenReturn(mockDeveloper);
-        Assertions.assertThat(developerService.save(mockDeveloper)).isEqualTo(mockDeveloper);*/
+        developerService.update(mockDeveloper);
+        Assertions.assertThat(developerService.save(mockDeveloper)).isEqualTo(mockDeveloper);
     }
 
     @Test
