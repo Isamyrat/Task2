@@ -38,9 +38,9 @@ public class DeveloperService {
 
     public Boolean existsByEmail(String email) {
         if (developerRepository.existsByEmail(email)) {
-            log.error("Developer with email: " + email + " is not exist");
             return true;
         }
+        log.error("Developer with email: " + email + " is not exist");
         return false;
     }
 
@@ -68,7 +68,7 @@ public class DeveloperService {
         return developer1;
     }
 
-    public Developer findById(Long id) {
+    public Developer findById(Long id) throws DeveloperNotFoundException {
         return developerRepository.findById(id)
                 .orElseThrow(() -> new DeveloperNotFoundException("Developer not exist with id:" + id));
     }
