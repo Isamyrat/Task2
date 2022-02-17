@@ -11,6 +11,7 @@ import root.developer.service.DeveloperService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -18,15 +19,13 @@ public class DeveloperController {
 
     private final DeveloperService developerService;
 
+
     @RequestMapping(value = "/developer/save", method = RequestMethod.POST)
-    public ResponseEntity<?> save(@Valid @RequestBody Developer developer){
-        Developer developer1 = developerService.save(developer);
-        if (developer1 != null) {
-            return new ResponseEntity<>(developer, HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
-        }
+    public ResponseEntity<Map<String, Developer>> save(@Valid @RequestBody Developer developer){
+        Map<String,Developer> map = developerService.save(developer);
+        return ResponseEntity.ok(map);
     }
+
     @RequestMapping(value = "/developer/findAll",method = RequestMethod.GET)
     public List<Developer> findAll(){
         return developerService.findAll();
@@ -41,13 +40,10 @@ public class DeveloperController {
             return new ResponseEntity<>(developer, HttpStatus.OK);
         }
     }
-    @RequestMapping(value = "/developer/update", method = RequestMethod.POST)
-    public ResponseEntity<?> update(@Valid @RequestBody Developer developer){
-        Developer developer1  = developerService.update(developer);
-        if (developer1 == null) {
-            throw  new DeveloperNotFoundException("Developer id must not be null");
-        }
-        return new ResponseEntity<>(developer1, HttpStatus.OK);
-    }
+    @RequestMapping(value = "/developer/update", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Developer>> update(@Valid @RequestBody Developer developer){
+        Map<String,Developer> map = developerService.update(developer);
 
+        return ResponseEntity.ok(map);
+    }
 }

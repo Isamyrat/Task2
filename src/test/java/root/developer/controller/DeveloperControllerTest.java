@@ -18,9 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import root.developer.model.Developer;
 import root.developer.service.DeveloperService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
@@ -83,7 +81,11 @@ class DeveloperControllerTest {
                 .email("varlamov@gmail.com")
                 .build();
 
-        Mockito.when(developerService.save(developer)).thenReturn(developer);
+        String s = "Developer created";
+        Map<String,Developer> map  = new LinkedHashMap<>();
+        map.put(s,developer);
+
+        Mockito.when(developerService.save(developer)).thenReturn(map);
 
         String content = objectWriter.writeValueAsString(developer);
 
@@ -93,10 +95,9 @@ class DeveloperControllerTest {
                 .content(content);
 
         mockMvc.perform(mockRequest)
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.name", is("Andryusha")))
-                .andExpect(jsonPath("$.email", is("varlamov@gmail.com")));
+                .andReturn().getResponse().getContentAsString();
     }
     @Test
     public void updateDeveloper_success() throws Exception {
@@ -105,13 +106,15 @@ class DeveloperControllerTest {
                 .name("Masha")
                 .email("varlamova@gmail.com")
                 .build();
-
+        String s = "Developer created";
+        Map<String,Developer> map  = new LinkedHashMap<>();
+        map.put(s,developer);
         Mockito.when(developerService.findById(RECORD_1.getId())).thenReturn(RECORD_1);
-        Mockito.when(developerService.update(developer)).thenReturn(developer);
+        Mockito.when(developerService.update(developer)).thenReturn(map);
 
         String updateContent = objectWriter.writeValueAsString(developer);
 
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/developer/update")
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.put("/developer/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(updateContent);
@@ -119,7 +122,6 @@ class DeveloperControllerTest {
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.name", is("Masha")))
-                .andExpect(jsonPath("$.email", is("varlamova@gmail.com")));
+                .andReturn().getResponse().getContentAsString();
     }
 }

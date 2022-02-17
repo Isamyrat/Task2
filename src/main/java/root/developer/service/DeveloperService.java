@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 import root.developer.exception.DeveloperNotFoundException;
 import root.developer.model.Developer;
 import root.developer.repository.DeveloperRepository;
+
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -17,55 +20,65 @@ public class DeveloperService {
 
     private final DeveloperRepository developerRepository;
 
-    public Developer save(Developer developer) {
+    public Map<String, Developer> save(Developer developer) {
+        Map<String, Developer> response = new LinkedHashMap<>();
         if (developerRepository.existsByEmail(developer.getEmail())) {
-            throw new DeveloperNotFoundException("Cant save new developer with this email because it is busy");
+            response.put("Cant save new developer with this email because it is busy or check valid email(dog@gmail.com)", developer);
+            return response;
         }
         if (!checkUserName(developer.getName())) {
-            throw new DeveloperNotFoundException("Cant save new developer with this email because it is busy");
+            response.put("Cant save new developer with this name because name's length should be 50<name>2 or check valid name it should start with alphabet", developer);
+            return response;
         }
         developerRepository.save(developer);
-        return developer;
+        response.put("Developer created", developer);
+        return response;
     }
 
     public Boolean checkUserName(String username) {
-        if (Pattern.matches("^[A-Za-z]", String.valueOf(username.charAt(0)))) {
-            log.info("Developer with username: " + username + " passed verification");
-            return true;
+        if( username.length() > 2 && username.length() < 50){
+            if (Pattern.matches("^[A-Za-z]", String.valueOf(username.charAt(0)))) {
+                log.info("Developer with username: " + username + " passed verification");
+                return true;
+            }
         }
         return false;
     }
 
     public Boolean existsByEmail(String email) {
-        if (developerRepository.existsByEmail(email)) {
-            return true;
+        if (!developerRepository.existsByEmail(email)) {
+            return !Pattern.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", email);
         }
-        log.error("Developer with email: " + email + " is not exist");
-        return false;
+        return true;
     }
 
-    public Developer update(Developer developer) {
+    public Map<String, Developer> update(Developer developer) {
+        Map<String, Developer> response = new LinkedHashMap<>();
         Developer developer1;
         if (developer.getId() != null) {
             developer1 = developerRepository.findById(developer.getId())
                     .orElseThrow(() -> new DeveloperNotFoundException("Developer not exist with id:" + developer.getId()));
             if (developer.getEmail() != null) {
-                if (existsByEmail(developer.getEmail())) {
-                    throw new DeveloperNotFoundException("Cant save new developer with this email because it is busy");
+                if (developerRepository.existsByEmail(developer.getEmail())) {
+                    response.put("Cant save new developer with this email because it is busy or check valid email(dog@gmail.com)", developer);
+                    return response;
                 }
                 developer1.setEmail(developer.getEmail());
             }
             if (developer.getName() != null) {
                 if (!checkUserName(developer.getName())) {
-                    throw new DeveloperNotFoundException("Cant save new developer with this email because it is busy");
+                    response.put("Cant save new developer with this name because name's length should be 50<name>2 or check valid name it should start with alphabet", developer);
+                    return response;
                 }
                 developer1.setName(developer.getName());
             }
-
             developerRepository.save(developer1);
-
-        } else throw new DeveloperNotFoundException("Developer id is null");
-        return developer1;
+        } else {
+            response.put("Developer id is null!! Please write id:", developer);
+            return response;
+        }
+        response.put("Developer created", developer);
+        return response;
     }
 
     public Developer findById(Long id) throws DeveloperNotFoundException {

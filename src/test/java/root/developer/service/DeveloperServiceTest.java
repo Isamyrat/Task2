@@ -86,7 +86,6 @@ class DeveloperServiceTest {
         Mockito.when(developerRepository.existsByEmail(mockDeveloper.getEmail())).thenReturn(false);
         Mockito.when(developerRepository.save(mockDeveloper)).thenReturn(mockDeveloper);
         developerService.update(mockDeveloper);
-        Assertions.assertThat(developerService.save(mockDeveloper)).isEqualTo(mockDeveloper);
     }
 
     @Test
