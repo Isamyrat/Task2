@@ -22,6 +22,12 @@ public class DeveloperService {
 
     public Map<String, Developer> save(Developer developer) {
         Map<String, Developer> response = new LinkedHashMap<>();
+        if(developer.getId() != null) {
+            if (developerRepository.existsById(developer.getId())) {
+                response.put("This id is busy", developer);
+                return response;
+            }
+        }
         if (developerRepository.existsByEmail(developer.getEmail())) {
             response.put("Cant save new developer with this email because it is busy or check valid email(dog@gmail.com)", developer);
             return response;
@@ -31,7 +37,8 @@ public class DeveloperService {
             return response;
         }
         developerRepository.save(developer);
-        response.put("Developer created", developer);
+        Developer developer1 = developerRepository.findByEmail(developer.getEmail());
+        response.put("Developer created", developer1);
         return response;
     }
 
