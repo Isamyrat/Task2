@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import root.developer.controller.Validation;
 import root.developer.exception.DeveloperNotFoundException;
 import root.developer.model.Developer;
 import root.developer.repository.DeveloperRepository;
@@ -20,32 +21,31 @@ public class DeveloperService {
 
     private final DeveloperRepository developerRepository;
 
-    public Map<String, Developer> save(Developer developer) {
-        Map<String, Developer> response = new LinkedHashMap<>();
+    public Map<Validation, Developer> save(Developer developer) {
+        Map<Validation, Developer> response = new LinkedHashMap<>();
         if(developer.getId() != null) {
             if (developerRepository.existsById(developer.getId())) {
-                response.put("This id is busy", developer);
+                response.put(Validation.IDBUSY, developer);
                 return response;
             }
         }
-        if (developerRepository.existsByEmail(developer.getEmail())) {
-            response.put("Cant save new developer with this email because it is busy or check valid email(dog@gmail.com)", developer);
+        if (existsByEmail(developer.getEmail())) {
+            response.put(Validation.EMAILBUSYORINVALID, developer);
             return response;
         }
         if (!checkUserName(developer.getName())) {
-            response.put("Cant save new developer with this name because name's length should be 50<name>2 or check valid name it should start with alphabet", developer);
+            response.put(Validation.NAMEINVALID, developer);
             return response;
         }
         developerRepository.save(developer);
         Developer developer1 = developerRepository.findByEmail(developer.getEmail());
-        response.put("Developer created", developer1);
+        response.put(Validation.CREATED, developer1);
         return response;
     }
 
     public Boolean checkUserName(String username) {
         if( username.length() > 2 && username.length() < 50){
             if (Pattern.matches("^[A-Za-z]", String.valueOf(username.charAt(0)))) {
-                log.info("Developer with username: " + username + " passed verification");
                 return true;
             }
         }
@@ -59,32 +59,32 @@ public class DeveloperService {
         return true;
     }
 
-    public Map<String, Developer> update(Developer developer) {
-        Map<String, Developer> response = new LinkedHashMap<>();
+    public Map<Validation, Developer> update(Developer developer) {
+        Map<Validation, Developer> response = new LinkedHashMap<>();
         Developer developer1;
         if (developer.getId() != null) {
             developer1 = developerRepository.findById(developer.getId())
                     .orElseThrow(() -> new DeveloperNotFoundException("Developer not exist with id:" + developer.getId()));
             if (developer.getEmail() != null) {
-                if (developerRepository.existsByEmail(developer.getEmail())) {
-                    response.put("Cant save new developer with this email because it is busy or check valid email(dog@gmail.com)", developer);
+                if (existsByEmail(developer.getEmail())) {
+                    response.put(Validation.EMAILBUSYORINVALID, developer);
                     return response;
                 }
                 developer1.setEmail(developer.getEmail());
             }
             if (developer.getName() != null) {
                 if (!checkUserName(developer.getName())) {
-                    response.put("Cant save new developer with this name because name's length should be 50<name>2 or check valid name it should start with alphabet", developer);
+                    response.put(Validation.NAMEINVALID, developer);
                     return response;
                 }
                 developer1.setName(developer.getName());
             }
             developerRepository.save(developer1);
         } else {
-            response.put("Developer id is null!! Please write id:", developer);
+            response.put(Validation.IDNULL, developer);
             return response;
         }
-        response.put("Developer created", developer);
+        response.put(Validation.CREATED, developer1);
         return response;
     }
 
@@ -95,5 +95,17 @@ public class DeveloperService {
 
     public List<Developer> findAll() {
         return (List<Developer>) developerRepository.findAll();
+    }
+    public Validation delete(Long id) {
+        Developer developer1 ;
+        if (id != null) {
+            developer1 = developerRepository.findById(id)
+                    .orElseThrow(() -> new DeveloperNotFoundException("Developer not exist with id:" + id));
+
+            developerRepository.delete(developer1);
+            return Validation.DELETED;
+        } else {
+            return Validation.IDNULL;
+        }
     }
 }
