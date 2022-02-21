@@ -5,6 +5,7 @@ import org.apache.tomcat.util.http.HeaderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import root.developer.exception.DeveloperNotFoundException;
 import root.developer.model.Developer;
@@ -20,7 +21,7 @@ public class DeveloperController {
 
     private final DeveloperService developerService;
 
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/developer/save", method = RequestMethod.POST)
     public ResponseEntity<?> save(@Valid @RequestBody Developer developer){
         Map<Validation,Developer> map = developerService.save(developer);
@@ -58,6 +59,7 @@ public class DeveloperController {
             return new ResponseEntity<>(developer, HttpStatus.OK);
         }
     }
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/developer/update", method = RequestMethod.PUT)
     public ResponseEntity<?> update(@Valid @RequestBody Developer developer){
         Map<Validation,Developer> map = developerService.update(developer);
@@ -80,6 +82,7 @@ public class DeveloperController {
         }  else
             return ResponseEntity.ok(developer1);
     }
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/developer/delete/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteDeveloper(@PathVariable Long id) {
         if(developerService.delete(id) == Validation.IDNULL){
