@@ -14,6 +14,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -28,9 +29,10 @@ public class JwtFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain fc)
             throws IOException, ServletException {
         final String token = getTokenFromRequest((HttpServletRequest) request);
+
         if (token != null && jwtProvider.validateAccessToken(token)) {
             final Claims claims = jwtProvider.getAccessClaims(token);
-            if(claims.getIssuer().equals("GP")) {
+            if(claims.getIssuer().equals("GP") && claims.get("roles", List.class) != null) {
                 final JwtAuthentication jwtInfoToken = JwtUtils.generate(claims);
                 jwtInfoToken.setAuthenticated(true);
                 SecurityContextHolder.getContext().setAuthentication(jwtInfoToken);
