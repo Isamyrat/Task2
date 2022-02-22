@@ -10,5 +10,5 @@ import java.util.Set;
 public class JwtRequest {
 
     private Set<Role> roles;
-
+    private String issuer;
 }

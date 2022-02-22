@@ -27,13 +27,14 @@ public class JwtProvider {
         final LocalDateTime now = LocalDateTime.now();
         final Instant accessExpirationInstant = now.plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant();
         final Date accessExpiration = Date.from(accessExpirationInstant);
-        return Jwts.builder()
-                .setSubject("task2")
-                .setExpiration(accessExpiration)
-                .signWith(SignatureAlgorithm.HS512, jwtAccessSecret)
-                .claim("roles", jwtRequest.getRoles())
-                .claim("firstName", "GP")
-                .compact();
+
+            return Jwts.builder()
+                    .setSubject("task2")
+                    .setExpiration(accessExpiration)
+                    .signWith(SignatureAlgorithm.HS512, jwtAccessSecret)
+                    .claim("roles", jwtRequest.getRoles())
+                    .setIssuer(jwtRequest.getIssuer())
+                    .compact();
     }
 
 
