@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 
 @Slf4j
@@ -31,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (token != null && jwtProvider.validateAccessToken(token)) {
             final Claims claims = jwtProvider.getAccessClaims(token);
-            if (!claims.getIssuer().equals("GP")) {
+            if (!claims.getIssuer().equals("GP") || claims.get("roles", List.class) == null) {
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 return;
             }
